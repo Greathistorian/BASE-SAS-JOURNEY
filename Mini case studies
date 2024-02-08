@@ -1,0 +1,77 @@
+*PROGRAMME BY MARANROOLA ISRAEL OLABODE
+DATE:14/08/2023*;
+*Task:
+1Prepare the permanent data set info by reading the txt file info.txt which contains 
+information on id, age, height, weight, and gender.
+
+2. Calculate BMI (Body Mass Index) of the subject. Give it a label as “BMI”.
+
+3. Print the data set info in the Output folder with page number as 20, appropriate 
+title and today’s date in the footnote.
+
+4. Display the contents of the data set info in Output folder with appropriate title and 
+today’s date in the footnote.
+
+5. Output folder should also contain the log.
+
+Input: 1. info.txt
+
+Output: 1. info.sas7bdat
+
+2. info.lst
+
+3. contents_info.lst
+
+4. info.log
+
+Prog: info.sas
+
+Mock Output:
+
+1. info.sas7bdat*;
+************************************************************************;
+*SETTIING UP SYSTEM OPTION
+*************************************************************************;
+
+OPTIONS PAGENO=20;
+************************************************************************;
+*SETTING UP PROC PRINTTO
+************************************************************************;
+PROC PRINTTO LOG="/home/u63342499/mylib/INFOLOG.LST";
+ods listing file="/home/u63342499/mylib/contents_INFO.LST";
+
+
+*ESTABLISHING THE LIBRARY
+*************************************************************************;
+LIBNAME MYLIB"/home/u63342499/mylib";
+
+*******************************************************************************;
+*INPORTING THE DATA AND DERIVING BMI
+********************************************************************************;
+DATA MYLIB.INFO(bufsize=4096);*buffsize adopted to meet exact specifications
+     INFILE "C:\Users\AFSS-Student\OneDrive\FOLDER D\OneDrive\Desktop\all\mini case study\MCS1\Raw_Data\info.txt" DLM='*';
+     INPUT ID AGE HEIGHT WEIGHT GENDER$;
+     BMI=(WEIGHT)/(HEIGHT/100)**2;
+	 BMI=ROUND(BMI,0.01);
+     LABEL BMI=BMI;
+RUN;
+***********************************************************************************;
+*PRINTING THE DATASET AND GIVING TITLE AND FOOTNOTES TO REPORT
+***********************************************************************************;
+PROC PRINT DATA=MYLIB.INFO ;
+     TITLE "Report on Body Mass Index ";
+     FOOTNOTE "%sysfunc(time(),time5.) %SYSFUNC(TODAY(),Weekdate23.)";
+RUN;
+***********************************************************************************;
+*DISPLAYING THE CONTENTS OF THE DATASET AND GIVING TITLE AND FOOTNOTES TO REPORT
+***********************************************************************************;
+TITLE "Contents of the dataset info";
+FOOTNOTE "%sysfunc(time(),time5.) %SYSFUNC(TODAY(),Weekdate23.)";
+options pagesize=45;
+PROC CONTENTS DATA=MYLIB.INFO;
+RUN;
+ods listing close;
+PROC PRINTTO;
+RUN;
+
+***********************THANK YOU****************************************
