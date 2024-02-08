@@ -1,0 +1,76 @@
+*****************************************************************************;
+*Case study   :-  MCS3
+ Program      :-  info.sas
+ Author       :-  Maranroola Israel Olabode
+ Date         :-  16AUG2023
+ SAS_version  :-  SAS studio
+ Input  files :-  sashelp.class.sas7bdat
+ Output       :-  1. newclass.sas7bdat
+              :-  2. newclass.pdf
+              :-  3. sashelplib.pdf
+              :-  4. two.log
+ Operating_system :- windows 10 ;
+****************************************************;
+*SETTING UP PROC PRINTTO FOR THE LOG
+****************************************************;
+
+proc printto log="/home/u63342499/mylib/two.log";
+
+****************************************************;
+*CREATING LIBRARY FOR THE PERMANENT DATASET
+****************************************************;
+
+LIBNAME MYLIB"/home/u63342499/mylib";
+
+
+***************************************************;
+*CREATING THE PERMANENT  DATASET
+***************************************************;
+
+DATA MYLIB.NEWCLASS(bufsize=4096);
+     SET SASHELP.CLASS; 
+RUN;
+***************************************************;
+*SETTING SYSTEM OPTIONS 
+***************************************************;
+
+options nodate nonumber;
+***************************************************;
+*ESTABLISHING THE OUTPUT DELIVERY SYSTEM
+***************************************************;
+
+ods rtf close;
+ods listing close;
+ods pdf file="/home/u63342499/mylib/newclass.pdf";
+
+**************************************************************************************************;
+*2. Print the data set newclass with two variables name and age in pdf file with appropriate title.
+***************************************************************************************************;
+
+PROC PRINT DATA=MYLIB.NEWCLASS;
+     VAR NAME AGE;
+     TITLE "Newclass data set";
+RUN;
+
+**************************************************************************************************************************;
+*Display the contents of this newclass data set in the same pdf file in the output folder which contains the print report. 
+***************************************************************************************************************************;
+TITLE " ";
+proc contents data=mylib.newclass;
+run;
+ods pdf close;
+
+******************************************************************************************************************************************************************************;
+*4. Display the contents of the sashelp library without displaying the descriptor portions of the individual members of the library in another pdf file in the output folder.
+*******************************************************************************************************************************************************************************;
+
+ods listing close;
+ods rtf close;
+ods pdf file="/home/u63342499/mylib/sashelplib.pdf";
+proc contents data=sashelp._all_ nods;
+run;
+ods pdf close;
+proc printto;
+run;
+
+*********************************************THANK YOU****************************************************;
