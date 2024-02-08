@@ -1,0 +1,91 @@
+*PROGRAMMER:MARANROOLA ISRAEL OLABODE
+DATE 15/03/2023.
+*Task: 
+1. Read the raw data file info.txt which contains data on id, site, age, gender, work 
+ status into a permanent data set info.sas7bdat.
+2. Create a single rtf file containing listing reports of following on separate pages with 
+ appropriate titles and today’s date in the footnote.
+a. Print only those observations where gender is Male
+b. Print only those observations where age lies between 50 and 55
+c. Print only those observations where age is absent
+d. Printing only those observations where gender is female and age is more than 55
+e. Printing data of subjects whose work status is either job or working
+f. Printing only those subjects' data who are retired and are below 64
+Input: 1. info.txt
+Output: 1. info.sas7bdat
+ 2. info.rtf
+ 3. info.log
+Prog: info.sas*;
+*************************************************************************************;
+*SETTING SYSTEM OPTION
+*************************************************************************************;
+proc printto log="/home/u63342499/mylib/infolog.log";
+OPTIONS NODATE NONUMBER ;
+options pagesize=15 orientation=landscape;
+**************************************************************************************;
+*SETTING UP THE LIBRARY FOR THE PERMANENT DATASET
+***************************************************************************************;
+
+LIBNAME MCS3"/home/u63342499/mylib";
+
+**************************************************************************************;
+*READING RAW DATAfile info.txt
+**************************************************************************************;
+
+DATA MCS3.INFO;
+     INFILE "/home/u63342499/mylib/info.txt" DLM=":" DSD;
+     INPUT id site$ age gender$ work_status$;
+RUN;
+
+***************************************************************************************;
+*ESTABLISHING THE ODS RTF INSTRUCTIONS
+****************************************************************************************;
+ODS RTF FILE="/home/u63342499/mylib/info.rtf";
+ODS ESCAPECHAR='^';
+
+****************************************************************************************;
+*USING THE PROC PRINT PROCEDURE AND THE WHERE STATEMENT TO REPORT AS SEPCIFIED
+****************************************************************************************;
+OPTIONS PAGENO=2;
+PROC PRINT DATA=MCS3.INFO width=full ;
+     WHERE GENDER IN( "M","m");
+	 TITLE height=15pt font='times new roman' "Data on Males" ;
+	 FOOTNOTE "Created on %SYSFUNC(DATE(),DATE9.)" J=R 'Page ^{thispage} / ^{thispage}';
+RUN;
+
+OPTIONS PAGENO=2;
+PROC PRINT DATA=MCS3.INFO width=full;
+     WHERE AGE BETWEEN 50 AND 55;
+	 TITLE height=15pt font='times new roman' "Data where age lies between 50 and 55";
+	 FOOTNOTE "Created on %SYSFUNC(DATE(),DATE9.)" J=R 'Page ^{thispage} / ^{thispage}';
+RUN;
+OPTIONS PAGENO=3;
+PROC PRINT DATA=MCS3.INFO width=full;
+     WHERE AGE IS MISSING;
+	 TITLE height=15pt font='times new roman' "Data where age is absent" ;
+	 FOOTNOTE "Created on %SYSFUNC(DATE(),DATE9.)" J=R 'Page ^{thispage} / ^{thispage}';
+RUN;
+OPTIONS PAGENO=3;
+PROC PRINT DATA=MCS3.INFO width=full;
+     WHERE GENDER IN( "F","f") AND AGE GT 55;
+	 TITLE height=15pt font='times new roman' "Data on Females over 55" ;
+	 FOOTNOTE "Created on %SYSFUNC(DATE(),DATE9.)" J=R 'Page ^{thispage} / ^{thispage}';
+RUN;
+OPTIONS PAGENO=4;
+PROC PRINT DATA=MCS3.INFO width=full;
+     WHERE WORK_STATUS LIKE "_o%";
+	 TITLE  height=15pt font='times new roman' "Data on working subjects" ;
+	 FOOTNOTE "Created on %SYSFUNC(DATE(),DATE9.)" J=R 'Page ^{thispage} / ^{thispage}';
+RUN;
+OPTIONS PAGENO=4;
+PROC PRINT DATA=MCS3.INFO width=full;
+     WHERE WORK_STATUS CONTAINS "Ret" AND AGE LT 64;
+	 TITLE height=15pt font='times new roman'"Data on retired subjects below 64" ;
+	 FOOTNOTE "Created on %SYSFUNC(DATE(),DATE9.)" J=R 'Page ^{5} /^{thispage}';
+RUN;
+proc printto;
+run;
+ODS RTF CLOSE;
+run;
+
+***************************************THANK YOU*************************************************
